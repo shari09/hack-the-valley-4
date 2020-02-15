@@ -30,3 +30,10 @@ class LeapListener(Leap.Listener):
             #     "Zone:", index.touch_zone, "Position:", index.tip_position
             # print "Frame id: %d, timestamp: %d, hands: %d, fingers: %d" % (
             #   frame.id, frame.timestamp, len(frame.hands), len(frame.fingers))
+        while (hand.fingers.finger_type(Finger.TYPE_INDEX) && hand.fingers.finger_type(Finger.TYPE_THUMB)):
+            if hand.PinchStrength <= 1 and hand.PinchStrength > 0.5:
+                print "zoom out"
+            elif hand.PinchStrength < 0.5  and hand.PinchStrength >= 0:
+                print "zoom in"
+        
+        
