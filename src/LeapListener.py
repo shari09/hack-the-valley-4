@@ -42,11 +42,31 @@ class LeapListener(Leap.Listener):
         
         self.lastFrame = frame
         
+
+        
         while (hand.fingers.finger_type(Finger.TYPE_INDEX) and hand.fingers.finger_type(Finger.TYPE_THUMB)):
             if  0.5 < hand.PinchStrength <= 1:
                 print "zoom out"
             elif 0 >= hand.PinchStrength <= 0.5:
                 print "zoom in"
+
+        for gesture in frame.guesture():
+            if gesture.type == Leap.Gesture.TYPE_CIRCLE:
+                circle = CircleGesture(gesture)
+                if circle.pointable.direction.angle_to(circle.normal) <= Leap.PI/2:
+                    clockwise = "clockwise"
+                else:
+                    counterclockwise = "counter-clockwise"
+                swept_angle = 0
+                if circle.state != Leap.Gesture.STATE_START:
+                    previous = CircleGesture(controller.fram(1).gesture(circle.id))
+                    swept_angle = (circle.progress - previous.progress) * 2 * Leap.PI
+                print "id: " + str(circle.id) + "progress: " + str(circle.progress) + " Radius: " + str(circle.radius) + " swept angle: " + str(swept_angle * Leap.RAD_TO_DEG) + " " + clockdirection
+                
+
+
+
+
         
         
         
