@@ -16,17 +16,27 @@ def isDrawPos(hand):
 
 class LeapListener(Leap.Listener):
     def on_connect(self, controller):
-        print "lmao"
+        print 'connected'
 
     def on_frame(self, controller):
         frame = controller.frame()
-        if (not frame.hands.is_empty
-           and isDrawPos(frame.hands.rightmost)):
-            print 'can draw now'
-            index = frame.hands.rightmost.fingers.finger_type(Leap.Finger.TYPE_INDEX)[0]
+        if not frame.hands.is_empty: 
+            rightHand = frame.hands.rightmost
+            if isDrawPos(rightHand):
+                print 'can draw now'
+                index = rightHand.fingers.finger_type(Leap.Finger.TYPE_INDEX)[0]
+            elif rightHand.grab_strength == 1:
+                print 'settings page'
+            elif rightHand.grab_strength > 0.5:
+                # 0.35 radians is approxiamately 20 degrees
+                if rightHand.rotation_angle(self.lastFrame, Leap.Vector.y_axis) > 0.25:
+                    print 'clockwise rotation'
+                else:
+                    print 'move page'
         else:
             print 'cannot draw'
             # print "Extended:", index.is_extended, "Distance:", index.touch_distance, \
             #     "Zone:", index.touch_zone, "Position:", index.tip_position
             # print "Frame id: %d, timestamp: %d, hands: %d, fingers: %d" % (
             #   frame.id, frame.timestamp, len(frame.hands), len(frame.fingers))
+        self.lastFrame = frame
