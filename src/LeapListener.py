@@ -1,6 +1,7 @@
 import sys
 import pygame
 import pygame.gfxdraw
+from Point import Point
 sys.path.insert(0, "./lib/x86")
 import Leap
 from Settings import Settings
@@ -30,11 +31,11 @@ def isZoomPos(hand):
 
 
 class LeapListener(Leap.Listener):
-    def __init__(self, paintSurface):
+    def __init__(self, canvas):
         Leap.Listener.__init__(self)
-        self.paintSurface = paintSurface
-        self.finger_pos = [0, 0]
-        self.drawing = False
+        self.canvas = canvas
+        self.finger_pos = Point()
+        self.is_drawing = False
         self.lastFrame = None
         self.settingPage = Settings()
         self.settingLock = False
@@ -47,7 +48,7 @@ class LeapListener(Leap.Listener):
 
     def on_frame(self, controller):
         frame = controller.frame()
-        self.drawing = False
+        self.is_drawing = False
         if not frame.hands.is_empty:
             rightHand = frame.hands.rightmost
 
@@ -83,25 +84,22 @@ class LeapListener(Leap.Listener):
                         else:
                             self.settingLock = True
 
-
-
             # drawing pos
             if isDrawPos(rightHand):
-                print 'can draw now'
+                # print 'can draw now'
                 index = rightHand.fingers.finger_type(Leap.Finger.TYPE_INDEX)[0]
                 x = int(2*index.stabilized_tip_position[0]+400)
                 y = int(-2*index.stabilized_tip_position[1]+800)
-                self.finger_pos[0] = x
-                self.finger_pos[1] = y
+                self.finger_pos.x = x
+                self.finger_pos.y = y
                 if index.touch_distance < 0 and not self.settingLock:
-                    self.drawing = True
+                    self.is_drawing = True
                     colour = (255, 0, 0)
                     if self.eraser:
                         colour = (255, 255, 255)
-                    pygame.gfxdraw.aacircle(
-                        self.paintSurface, x, y, 
-                        self.brushSize, colour)
-                    pygame.draw.circle(self.paintSurface, colour, (x, y), self.brushSize)
+                    self.canvas.paint(x, y, colour, self.brushSize)
+                    # pygame.gfxdraw.aacircle(self.canvas, x, y, 3, (255, 0, 0))
+                    # pygame.draw.circle(self.canvas, (255, 0, 0), (x, y), 3)
                     # print index.tip_position[0], index.tip_position[1]
             
             # zooming
