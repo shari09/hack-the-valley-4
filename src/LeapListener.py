@@ -29,6 +29,16 @@ def isZoomPos(hand):
                 return False
     return True
 
+def isSettingPos(hand):
+    for finger in hand.fingers:
+        if finger.type == Leap.Finger.TYPE_THUMB:
+            if finger.is_extended:
+                return False
+        else:
+            if not finger.is_extended:
+                return False
+    return True
+
 
 class LeapListener(Leap.Listener):
     def __init__(self, canvas):
@@ -109,31 +119,34 @@ class LeapListener(Leap.Listener):
                 diffMark = 0
                 if pinchDiff > diffMark:
                     print 'zoom out'
+                    self.canvas.change_zoom(0.005)
                 elif pinchDiff < -diffMark:
                     print 'zoom in'
+                    self.canvas.change_zoom(-0.005)
 
             # settings page
-            elif rightHand.grab_strength == 1:
+            # elif rightHand.grab_strength == 1:
+            elif isSettingPos(rightHand):
                 print 'settings page'
                 self.settingPage.display()
                 self.settingLock = True
 
                 # self.paintSurface.set_alpha(0)
                 
-            elif rightHand.grab_strength > 0.5:
-                # 0.35 radians is approxiamately 20 degrees
-                rotateMark = 0.02
-                rotateAngle = rightHand.rotation_angle(
-                                self.lastFrame, 
-                                Leap.Vector.y_axis)
-                if (rightHand.rotation_probability > 0.8):
-                    if (rotateAngle > rotateMark):
-                        print 'clockwise rotation'
-                    elif (rotateAngle < -rotateMark):
-                        print 'counter clockwise'
-                    return
+            # elif rightHand.grab_strength > 0.5:
+            #     # 0.35 radians is approxiamately 20 degrees
+            #     rotateMark = 0.02
+            #     rotateAngle = rightHand.rotation_angle(
+            #                     self.lastFrame, 
+            #                     Leap.Vector.y_axis)
+            #     if (rightHand.rotation_probability > 0.8):
+            #         if (rotateAngle > rotateMark):
+            #             print 'clockwise rotation'
+            #         elif (rotateAngle < -rotateMark):
+            #             print 'counter clockwise'
+            #         return
                 
-                print 'move page'
+            #     print 'move page'
                 # for gesture in frame.gestures():
                 #     if gesture.type == Leap.Gesture.TYPE_CIRCLE:
                 #         circle = Leap.CircleGesture(gesture)
