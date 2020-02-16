@@ -52,10 +52,18 @@ class LeapListener(Leap.Listener):
                 print 'settings page'
             elif rightHand.grab_strength > 0.5:
                 # 0.35 radians is approxiamately 20 degrees
-                if rightHand.rotation_angle(self.lastFrame, Leap.Vector.y_axis) > 0.25:
-                    print 'clockwise rotation'
-                else:
-                    print 'move page'
+                rotateMark = 0.02
+                rotateAngle = rightHand.rotation_angle(
+                                self.lastFrame, 
+                                Leap.Vector.y_axis)
+                if (rightHand.rotation_probility) > 0.8:
+                    if (rotateAngle > rotateMark):
+                        print 'clockwise rotation'
+                    elif (rotateAngle < -rotateMark):
+                        print 'counter clockwise'
+                    return
+                
+                print 'move page'
         else:
             print 'cannot draw'
             # print "Extended:", index.is_extended, "Distance:", index.touch_distance, \
@@ -64,32 +72,6 @@ class LeapListener(Leap.Listener):
             #   frame.id, frame.timestamp, len(frame.hands), len(frame.fingers))
         
         self.lastFrame = frame
-        
-
-        
-        # while (rightHand.fingers.finger_type(Leap.Finger.TYPE_INDEX) and rightHand.fingers.finger_type(Finger.TYPE_THUMB)):
-        #     if  0.5 < rightHand.PinchStrength <= 1:
-        #         print "zoom out"
-        #     elif 0 >= rightHand.PinchStrength <= 0.5:
-        #         print "zoom in"
-
-        # for gesture in frame.guesture():
-        #     if gesture.type == Leap.Gesture.TYPE_CIRCLE:
-        #         circle = CircleGesture(gesture)
-        #         if circle.pointable.direction.angle_to(circle.normal) <= Leap.PI/2:
-        #             clockwise = "clockwise"
-        #         else:
-        #             counterclockwise = "counter-clockwise"
-        #         swept_angle = 0
-        #         if circle.state != Leap.Gesture.STATE_START:
-        #             previous = CircleGesture(controller.fram(1).gesture(circle.id))
-        #             swept_angle = (circle.progress - previous.progress) * 2 * Leap.PI
-        #         print "id: " + str(circle.id) + "progress: " + str(circle.progress) + " Radius: " + str(circle.radius) + " swept angle: " + str(swept_angle * Leap.RAD_TO_DEG) + " " + clockdirection
-                
-
-
-
-
-        
+  
         
         
