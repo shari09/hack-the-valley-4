@@ -5,13 +5,16 @@ class Settings():
   def __init__(self):
     self.surface = pygame.Surface((800, 800), flags=pygame.SRCALPHA)
     # self.surface.set_alpha(255)
+    self.surface.fill((255, 255, 255))
     self.buttons = [
       Button(0, 0, 100, 100, 'brush size -', self.surface),
       Button(0, 120, 100, 100, 'brush size +', self.surface),
-      Button(120, 0, 100, 100, 'eraser', self.surface)
+      Button(120, 0, 100, 100, 'eraser', self.surface),
+      Button(120, 120, 100, 100, 'brush', self.surface)
     ]
   
   def display(self):
+    
     for button in self.buttons:
       button.display()
 

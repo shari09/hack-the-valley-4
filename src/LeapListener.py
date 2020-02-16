@@ -62,17 +62,26 @@ class LeapListener(Leap.Listener):
                     elif gesture.type is Leap.Gesture.TYPE_SCREEN_TAP:
                         screenTap = Leap.ScreenTapGesture(gesture)
                         tapPoint = screenTap.position
-                        print tapPoint
+                        # print tapPoint
                         # do something with the tapPoint offset
-                        x = tapPoint.x
-                        y = tapPoint.y
+                        # x = tapPoint.x
+                        # y = tapPoint.y
+                        index = rightHand.fingers.finger_type(Leap.Finger.TYPE_INDEX)[0]
+                        x = int(2*index.stabilized_tip_position[0]+400)
+                        y = int(-2*index.stabilized_tip_position[1]+800)
                         clickedButton = self.settingPage.getClicked(x, y)
+                        print x, y
+                        self.settingLock = False
                         if clickedButton == 'brush size -':
                             self.brushSize -= 1
                         elif clickedButton == 'brush size +':
                             self.brushSize += 1
                         elif clickedButton == 'eraser':
                             self.eraser = True
+                        elif clickedButton == 'brush':
+                            self.eraser = False
+                        else:
+                            self.settingLock = True
 
 
 
@@ -92,7 +101,7 @@ class LeapListener(Leap.Listener):
                     pygame.gfxdraw.aacircle(
                         self.paintSurface, x, y, 
                         self.brushSize, colour)
-                    pygame.draw.circle(self.paintSurface, colour, (x, y), 4)
+                    pygame.draw.circle(self.paintSurface, colour, (x, y), self.brushSize)
                     # print index.tip_position[0], index.tip_position[1]
             
             # zooming

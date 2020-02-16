@@ -27,9 +27,9 @@ def main():
     controller.enable_gesture(Leap.Gesture.TYPE_SCREEN_TAP)
     controller.config.set('Gesture.Swipe.MinLength', 50.0)
     controller.config.set('Gesture.Swipe.MinVelocity', 100)
-    controller.config.set('Gesture.ScreenTap.MinForwardVelocity', 20)
+    controller.config.set('Gesture.ScreenTap.MinForwardVelocity', 10)
     controller.config.set('Gesture.ScreenTap.HistorySeconds', 0.5)
-    controller.config.set('Gesture.ScreenTap.MinDistance', 1.0)
+    controller.config.set('Gesture.ScreenTap.MinDistance', 0.5)
     
     controller.config.save()
 
