@@ -1,4 +1,6 @@
 import sys
+import pygame
+import pygame.gfxdraw
 sys.path.insert(0, "./lib/x86")
 import Leap
 
@@ -13,10 +15,11 @@ def isDrawPos(rightHand):
                 return False
     return True
 
+
 def isZoomPos(hand):
     for finger in hand.fingers:
         if (finger.type == Leap.Finger.TYPE_INDEX
-            or finger.type == Leap.Finger.TYPE_THUMB):
+                or finger.type == Leap.Finger.TYPE_THUMB):
             if not finger.is_extended:
                 return False
         else:
@@ -26,6 +29,12 @@ def isZoomPos(hand):
 
 
 class LeapListener(Leap.Listener):
+    def __init__(self, surface):
+        Leap.Listener.__init__(self)
+        self.surface = surface
+        self.finger_pos = [0, 0]
+        self.drawing = False
+        self.lastFrame = None
 
     def on_connect(self, controller):
         print 'connected'
@@ -33,15 +42,25 @@ class LeapListener(Leap.Listener):
 
     def on_frame(self, controller):
         frame = controller.frame()
-        if not frame.hands.is_empty: 
+        self.drawing = False
+        if not frame.hands.is_empty:
             rightHand = frame.hands.rightmost
             # drawing pos
             if isDrawPos(rightHand):
                 print 'can draw now'
                 index = rightHand.fingers.finger_type(Leap.Finger.TYPE_INDEX)[0]
+                x = int(2*index.stabilized_tip_position[0]+400)
+                y = int(-2*index.stabilized_tip_position[1]+800)
+                self.finger_pos[0] = x
+                self.finger_pos[1] = y
+                if index.touch_distance < 0:
+                    self.drawing = True
+                    pygame.gfxdraw.aacircle(self.surface, x, y, 5, (255, 0, 0))
+                    pygame.draw.circle(self.surface, (255, 0, 0), (x, y), 4)
+                    # print index.tip_position[0], index.tip_position[1]
             # full fist
             elif isZoomPos(rightHand):
-                pinchDiff = (rightHand.pinch_strength 
+                pinchDiff = (rightHand.pinch_strength
                              - self.lastFrame.hands.rightmost.pinch_strength)
                 diffMark = 0.05
                 if pinchDiff > diffMark:
@@ -62,11 +81,9 @@ class LeapListener(Leap.Listener):
             #     "Zone:", index.touch_zone, "Position:", index.tip_position
             # print "Frame id: %d, timestamp: %d, hands: %d, fingers: %d" % (
             #   frame.id, frame.timestamp, len(frame.hands), len(frame.fingers))
-        
-        self.lastFrame = frame
-        
 
-        
+        self.lastFrame = frame
+
         # while (rightHand.fingers.finger_type(Leap.Finger.TYPE_INDEX) and rightHand.fingers.finger_type(Finger.TYPE_THUMB)):
         #     if  0.5 < rightHand.PinchStrength <= 1:
         #         print "zoom out"
@@ -85,11 +102,3 @@ class LeapListener(Leap.Listener):
         #             previous = CircleGesture(controller.fram(1).gesture(circle.id))
         #             swept_angle = (circle.progress - previous.progress) * 2 * Leap.PI
         #         print "id: " + str(circle.id) + "progress: " + str(circle.progress) + " Radius: " + str(circle.radius) + " swept angle: " + str(swept_angle * Leap.RAD_TO_DEG) + " " + clockdirection
-                
-
-
-
-
-        
-        
-        
